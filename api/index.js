@@ -1,12 +1,11 @@
 const express = require('express');
 const multer = require('multer');
-const fs = require('fs');
 const { OpenAI } = require('openai');
 require('dotenv').config();
 
 const app = express();
 const port = process.env.PORT || 3000;
-const upload = multer({ dest: 'uploads/' });
+const upload = multer({ storage: multer.memoryStorage() });  // Use memory storage
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -18,8 +17,8 @@ app.post('/generate-recipe', upload.single('image'), async (req, res) => {
   }
 
   try {
-    // Read the uploaded image and convert it to base64
-    const image = fs.readFileSync(req.file.path, { encoding: 'base64' });
+    // Convert the uploaded image buffer to base64
+    const image = req.file.buffer.toString('base64');
 
     // Create the request payload
     const response = await openai.chat.completions.create({
@@ -53,9 +52,6 @@ app.post('/generate-recipe', upload.single('image'), async (req, res) => {
   } catch (error) {
     console.error('Error generating recipe:', error.response ? error.response.data : error.message);
     res.status(500).send('An error occurred while generating the recipe.');
-  } finally {
-    // Cleanup: delete the uploaded file
-    fs.unlinkSync(req.file.path);
   }
 });
 
