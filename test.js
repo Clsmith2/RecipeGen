@@ -11,7 +11,7 @@ async function sendImageToBackend(imagePath) {
     // Send the form to the backend using axios
     const response = await axios.post('https://forava-service-tbqsewu5uq-uc.a.run.app/generate-recipe', form, {
       headers: {
-        ...form.getHeaders(), // Get the correct headers for form data
+        ...form.getHeaders(),
       },
     });
 
